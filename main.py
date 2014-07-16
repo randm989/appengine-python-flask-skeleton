@@ -6,20 +6,39 @@ app = Flask(__name__)
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
 
+from google.appengine.api import users
+
 
 @app.route('/')
 def hello():
-    """Return a friendly HTTP greeting."""
-    return 'Hello World!'
+	"""Return a friendly HTTP greeting."""
+	user = users.get_current_user()
+	if user:
+		output = 'Hello %s!' % user.nickname()
+		if users.is_current_user_admin():
+			output += " You are an admin of this site"
+		output += "\n%s\n%s\n%s\n" % (user.email(), user.user_id(), user.federated_provider())
+		return output
+	return "Hello World!"
+
+@app.route('/signin')
+def signin():
+	user = users.get_current_user()
+	if user:
+		greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' % (user.nickname(), users.create_logout_url('/')))
+	else:
+		greeting = ('<a href="%s">Sign in or register</a>.' % users.create_login_url('/'))
+
+	return ('<html><body>%s</body></html>' % greeting)
 
 
 @app.errorhandler(404)
 def page_not_found(e):
-    """Return a custom 404 error."""
-    return 'Sorry, Nothing at this URL.', 404
+	"""Return a custom 404 error."""
+	return 'Sorry, Nothing at this URL.', 404
 
 
 @app.errorhandler(500)
 def page_not_found(e):
-    """Return a custom 500 error."""
-    return 'Sorry, unexpected error: {}'.format(e), 500
+	"""Return a custom 500 error."""
+	return 'Sorry, unexpected error: {}'.format(e), 500
