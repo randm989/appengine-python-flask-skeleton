@@ -1,7 +1,10 @@
 """`main` is the top level module for your Flask application."""
 
 # Import the Flask Framework
-from flask import Flask
+from flask import Flask, render_template
+from PythonChess.ChessBoard import ChessBoard
+from PythonChess.ChessGUI_text import ChessGUI_text
+
 app = Flask(__name__)
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
@@ -30,6 +33,17 @@ def signin():
 		greeting = ('<a href="%s">Sign in or register</a>.' % users.create_login_url('/'))
 
 	return ('<html><body>%s</body></html>' % greeting)
+
+@app.route('/renderTest')
+def renderTest():
+	cb = ChessBoard(0)
+	
+	gui = ChessGUI_text()
+	boardState = cb.GetState()
+	gui.Draw(boardState)
+	for i in xrange(len(boardState)):
+		boardState[i] = ["" if x == "e" else x for x in boardState[i]]
+	return render_template("chess_render.html", board = boardState)
 
 
 @app.errorhandler(404)

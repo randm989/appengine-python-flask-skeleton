@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <style>
+    td {width: 24px; height: 24px}
+    </style>
+    {% if title %}
+    <title>{{title}}</title>
+    {% else %}
+    <title>Chess Render Test</title>
+    {% endif %}
+  </head>
+  <body>
+    <table border=1>
+      {% for row in board %}
+        {% if loop.first %}
+          <tr>
+            {% for index in range(0,9) %}
+            <td>{{ index -1 if index > 0 else "" }}</td>
+            {% endfor %}
+          </tr>
+        {% endif %}
+        <tr>
+          <td>{{ loop.index - 1 }}</td>
+          {% for column in row %}
+          <td>
+            {{ column }}
+          </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

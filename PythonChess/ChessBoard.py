@@ -82,10 +82,10 @@ class ChessBoard:
 			newList.append(self.ConvertToAlgebraicNotation(square))
 		return newList
 
-	def ExportBoard(self):
+	def Export(self):
 		return json.dumps(self.squares)
 
-	def ImportBoard(self, boardData):
+	def Import(self, boardData):
 		self.squares = json.loads(boardData)
 
 	def ConvertToAlgebraicNotation(self,(row,col)):
