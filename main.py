@@ -4,6 +4,7 @@
 from flask import Flask, render_template
 from PythonChess.ChessBoard import ChessBoard
 from PythonChess.ChessGUI_text import ChessGUI_text
+from models.ChessUser import ChessUser
 
 app = Flask(__name__)
 # Note: We don't need to call run() since our application is embedded within
@@ -30,9 +31,22 @@ def signin():
 	if user:
 		greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' % (user.nickname(), users.create_logout_url('/')))
 	else:
-		greeting = ('<a href="%s">Sign in or register</a>.' % users.create_login_url('/'))
+		greeting = ('<a href="%s">Sign in or register</a>.' % users.create_login_url('/register'))
 
 	return ('<html><body>%s</body></html>' % greeting)
+
+@app.route('/register')
+def register():
+	user = users.get_current_user()
+	if user:
+		cu = ChessUser.get_by_id(user.user_id())
+		if cu is None:
+			cu = ChessUser(id = user.user_id(), userid = user.user_id(), username = user.nickname(), email=user.email())
+			cu.put()
+			return "New User Created for " + user.nickname()
+		return "Welcome back, " + user.nickname()
+
+	return "Please login before registering"
 
 @app.route('/renderTest')
 def renderTest():
@@ -42,7 +56,7 @@ def renderTest():
 	boardState = cb.GetState()
 	gui.Draw(boardState)
 	for i in xrange(len(boardState)):
-		boardState[i] = ["" if x == "e" else x for x in boardState[i]]
+		boardState[i] = ["." if x == "e" else x for x in boardState[i]]
 	return render_template("chess_render.html", board = boardState)
 
 
